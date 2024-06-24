@@ -3,6 +3,7 @@ import { HomeComponent } from './home/home.component';
 import { RedirectGuard } from './redirect.guard';
 import { RedirectingComponent } from './redirecting/redirecting.component';
 import { NotFoundComponent } from './not-found/not-found.component';
+import { TestComponent } from './test/test.component';
 
 export const routes: Routes = [
     {path: '', redirectTo: '/home', pathMatch: 'full'},
@@ -10,6 +11,8 @@ export const routes: Routes = [
     {path: 'home', component: HomeComponent},
     {path: 'source', component: RedirectingComponent, canActivate: [RedirectGuard], data: {externalUrl: 'https://github.com/Ascyt/www'}},
     {path: 'src', redirectTo: '/source', pathMatch: 'full'},
+
+    {path: 'test', component: TestComponent},
 
     {path: '**', component: NotFoundComponent}
 ];
