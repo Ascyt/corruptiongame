@@ -10,4 +10,7 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
   styleUrl: './home.component.scss'
 })
 export class HomeComponent {
+  public onClick(): void {
+    alert('You clicked the button!');
+  }
 }
