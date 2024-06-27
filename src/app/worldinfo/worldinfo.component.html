@@ -1,0 +1,18 @@
+<ul>
+    <li>Current world: <span class="world-name">{{worldsService.currentWorld.name}}</span></li>
+    <li>Corruption level: {{worldsService.currentWorld.corruptionLevel * 100}}%</li>
+
+    <li>Materials:</li>
+    <ul>
+        <li *ngFor="let material of worldsService.currentWorld.materials">
+            <a>{{material[0].name}}</a>: {{material[1]}}
+        </li>
+    </ul>
+
+    <li>Pickaxes:</li>
+    <ul>
+        <li *ngFor="let pickaxe of worldsService.currentWorld.pickaxes">
+            <a>{{pickaxe[0].name ?? '[hand]'}}</a>: {{pickaxe[1]}}
+        </li>
+    </ul>
+</ul>

@@ -1,36 +1,59 @@
 import { Injectable } from '@angular/core';
 import { World } from './world';
+import { Pickaxe } from './pickaxe';
 
 @Injectable({
   providedIn: 'root'
 })
 export class WorldsService {
   public currentWorld:World;
+  public startWorld:World;
+  public worlds:World[] = [];
+  public selectedPickaxe:Pickaxe;
 
   constructor() { 
-    this.currentWorld = {
+    this.startWorld = this.getWorldTemplate();
+    this.currentWorld = this.startWorld;
+    this.worlds.push(this.startWorld);
+
+    this.selectedPickaxe = this.currentWorld.pickaxes.find(p => p[1] === true)![0];
+  }
+
+  public getWorld(id:number):World {
+    return this.worlds.find(w => w.id === id)!;
+  }
+  public getMaterial(id:number):any {
+    return this.currentWorld.materials.find(m => m[0].id === id)![0];
+  }
+  public getPickaxe(id:number):any {
+    return this.currentWorld.pickaxes.find(p => p[0].id === id)![0];
+  }
+
+  public getWorldTemplate():World {
+    return {
+      id: 0,
       name: 'The World',
       materials: [
-        { 
+        [{ 
           id: 1,
           name: 'stone'
-        },
-        { 
+        }, 0],
+        [{ 
           id: 2,
           name: 'iron'
-        },
-        {
+        }, 0],
+        [{
           id: 3,
           name: 'gold'
-        },
-        { 
+        }, 0],
+        [{ 
           id: 4,
           name: 'diamond'
-        }
+        }, 0]
       ],
 
       pickaxes: [
-        {
+        [{
           id: 1,
           name: null,
           probabilities: [
@@ -40,8 +63,8 @@ export class WorldsService {
             }
           ],
           requiredToCraft: null
-        },
-        {
+        }, true],
+        [{
           id: 2,
           name: 'stone pickaxe',
           probabilities: [
@@ -58,8 +81,8 @@ export class WorldsService {
             material: 1,
             quantity: 3
           }]
-        },        
-        {
+        }, false],        
+        [{
           id: 3,
           name: 'iron pickaxe',
           probabilities: [
@@ -80,8 +103,8 @@ export class WorldsService {
             material: 2,
             quantity: 3
           }]
-        },
-        {
+        }, false],
+        [{
           id: 4,
           name: 'gold pickaxe',
           probabilities: [
@@ -106,8 +129,8 @@ export class WorldsService {
             material: 3,
             quantity: 3
           }]
-        },
-        {
+        }, false],
+        [{
           id: 5,
           name: 'diamond pickaxe',
           probabilities: [
@@ -132,7 +155,7 @@ export class WorldsService {
             material: 4,
             quantity: 3
           }]
-        }
+        }, false]
       ],
       corruptionLevel: 0,
       connectedTo: []
