@@ -2,8 +2,8 @@
     <li>Current pickaxe: {{worldsService.selectedPickaxe.name ?? '[hand]'}}</li>
     <li>Probabilities:</li>
     <ul>
-        <li *ngFor="let mineProbability of worldsService.selectedPickaxe.probabilities">
-            <a>{{worldsService.getMaterial(mineProbability.materialId).name}}</a>: {{mineProbability.probability * 100}}%
+        <li *ngFor="let mineProbability of worldsService.getNormalizedProbabilities(worldsService.selectedPickaxe.probabilities)">
+            <a>{{mineProbability[0].name}}</a>: {{mineProbability[1] * 100}}%
         </li>
     </ul>
 

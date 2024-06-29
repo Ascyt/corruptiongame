@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { World } from './world';
-import { CraftRequirement, Pickaxe } from './pickaxe';
+import { CraftRequirement, MineProbability, Pickaxe } from './pickaxe';
+import { Material } from './material';
 
 @Injectable({
   providedIn: 'root'
@@ -29,6 +30,57 @@ export class WorldsService {
     return this.currentWorld.pickaxes.find(p => p[0].id === id)![0];
   }
 
+  public mineWithCurrentPickaxe():Material {
+    const cumulativeDistribution: [Material, number][] = this.getCumulativeDistribution(this.selectedPickaxe.probabilities!);
+
+    // Generate a random number between 0 and the total sum of frequencies
+    const randomValue = Math.random();
+
+    // Find the corresponding letter based on the random value
+    for (const [material, cumulativeFreq] of cumulativeDistribution) {
+        if (randomValue <= cumulativeFreq) {
+          this.currentWorld.materials.find(m => m[0].id === material.id)![1]++;
+
+          return material;
+        }
+    }
+
+    return this.mineWithCurrentPickaxe(); // If a material is not found, try again
+  }
+  public getCumulativeDistribution(probabilities:MineProbability[]):[Material, number][] {
+    const cumulativeDistribution: [Material, number][] = [];
+    let cumulativeSum = 0;
+
+    // Sum the probabilities
+    for (const probability of probabilities) {
+      cumulativeSum += probability.probability;
+      cumulativeDistribution.push([this.getMaterial(probability.materialId), cumulativeSum]);
+    }
+
+    // Normalize the probabilities
+    for (let i = 0; i < cumulativeDistribution.length; i++) {
+      cumulativeDistribution[i][1] /= cumulativeSum;
+    }
+
+    return cumulativeDistribution;
+  }
+  public getNormalizedProbabilities(probabilities:MineProbability[]):[Material, number][] {
+    const normalizedProbabilities: [Material, number][] = [];
+    let sum = 0;
+
+    // Sum the probabilities
+    for (const probability of probabilities) {
+      sum += probability.probability;
+    }
+
+    // Normalize the probabilities
+    for (const probability of probabilities) {
+      normalizedProbabilities.push([this.getMaterial(probability.materialId), probability.probability / sum]);
+    }
+
+    return normalizedProbabilities;
+  }
+
   public requirementsMet(requirements:CraftRequirement[]):boolean {
     for (let requirement of requirements) {
       if (this.getWorld(this.getMaterial(requirement.materialId).fromWorldId).materials.find(m => m[0].id === requirement.materialId)![1] < requirement.quantity) {
@@ -39,7 +91,14 @@ export class WorldsService {
   }
 
   public craftPickaxe(pickaxe:Pickaxe) {
+    if (!this.requirementsMet(pickaxe.requiredToCraft!)) {
+      return;
+    }
     
+    for (let requirement of pickaxe.requiredToCraft!) {
+      this.getWorld(this.getMaterial(requirement.materialId).fromWorldId).materials.find(m => m[0].id === requirement.materialId)![1] -= requirement.quantity;
+    }
+    this.currentWorld.pickaxes.find(p => p[0].id === pickaxe.id)![1] = true;
   }
 
   public getWorldTemplate():World {
@@ -157,7 +216,7 @@ export class WorldsService {
           probabilities: [
             { 
               materialId: 1,
-              probability: 1
+              probability: 0.5
             },
             { 
               materialId: 2,
