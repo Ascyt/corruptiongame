@@ -3,7 +3,9 @@
     <li>Probabilities:</li>
     <ul>
         <li *ngFor="let mineProbability of worldsService.selectedPickaxe.probabilities">
-            <a>{{worldsService.getMaterial(mineProbability.material).name}}</a>: {{mineProbability.probability * 100}}%
+            <a>{{worldsService.getMaterial(mineProbability.materialId).name}}</a>: {{mineProbability.probability * 100}}%
         </li>
     </ul>
+
+    <button type="button" class="btn btn-outline-secondary" (click)="openPickaxeSelector()">Change pickaxe</button>
 </ul>

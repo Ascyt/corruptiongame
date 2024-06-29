@@ -1,0 +1,23 @@
+<div class="modal-header">
+    <h4 class="modal-title">Select Pickaxe</h4>
+    <button type="button" class="close" aria-label="Close" (click)="activeModal.dismiss('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <ul class="pickaxe-list">
+        <li *ngFor="let pickaxeGroup of worldsService.currentWorld.pickaxes">
+            <div *ngIf="pickaxeGroup[1]"> <!-- Unlocked pickaxe -->
+                <button type="button" (click)="selectPickaxe(pickaxeGroup[0])"
+                    [ngClass]="{'btn': true, 'btn-secondary': pickaxeGroup[0].id === worldsService.selectedPickaxe.id, 'btn-outline-secondary': pickaxeGroup[0].id !== worldsService.selectedPickaxe.id}"
+                >{{pickaxeGroup[0].name ?? '[hand]'}}</button>
+            </div>
+            <div *ngIf="!pickaxeGroup[1]"> <!-- Locked pickaxe -->
+                <button type="button" class="btn btn-outline-danger" (click)="openPurchasePickaxeModal(pickaxeGroup[0])">{{pickaxeGroup[0].name ?? '[hand]'}}</button>
+            </div>
+        </li>
+    </ul>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-outline-secondary" (click)="activeModal.close('Close click')">Close</button>
+</div>

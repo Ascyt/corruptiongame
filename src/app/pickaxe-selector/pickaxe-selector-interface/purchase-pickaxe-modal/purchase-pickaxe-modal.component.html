@@ -1,0 +1,20 @@
+<div class="modal-header">
+    <h4 class="modal-title">Craft {{pickaxe.name}}</h4>
+    <button type="button" class="close" aria-label="Close" (click)="activeModal.dismiss('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <p>This pickaxe requires the following materials to craft:</p>
+
+    <ul>
+        <li *ngFor="let cost of pickaxe.requiredToCraft">
+            <a>{{worldsService.getMaterial(cost.materialId).name}}</a>: {{cost.quantity}}
+        </li>
+    </ul>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-outline-secondary" (click)="activeModal.close('Close click')">Cancel</button>
+    <button *ngIf="requirementsMet" type="button" class="btn btn-success" (click)="purchasePickaxe()">Craft</button>
+    <button *ngIf="!requirementsMet" type="button" class="btn btn-danger" disabled>Not enough materials</button>
+</div>

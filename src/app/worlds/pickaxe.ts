@@ -1,18 +1,20 @@
 import { Material } from "./material";
+import { World } from "./world";
 
 export interface Pickaxe {
     id:number;
     name:string|null;
     probabilities:MineProbability[];
     requiredToCraft:CraftRequirement[]|null;
+    fromWorldId:number;
 }
 
 export interface MineProbability {
-    material:number;
+    materialId:number;
     probability:number;
 }
 
 export interface CraftRequirement {
-    material:number;
+    materialId:number;
     quantity:number;
 }
