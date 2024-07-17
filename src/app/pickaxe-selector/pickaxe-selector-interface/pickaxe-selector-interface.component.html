@@ -6,10 +6,10 @@
   </div>
   <div class="modal-body">
     <ul class="pickaxe-list">
-        <li *ngFor="let pickaxeGroup of worldsService.currentWorld.pickaxes">
+        <li *ngFor="let pickaxeGroup of worldsService.getCurrentWorld().pickaxes">
             <div *ngIf="pickaxeGroup[1]"> <!-- Unlocked pickaxe -->
                 <button type="button" (click)="selectPickaxe(pickaxeGroup[0])"
-                    [ngClass]="{'btn': true, 'btn-secondary': pickaxeGroup[0].id === worldsService.selectedPickaxe.id, 'btn-outline-secondary': pickaxeGroup[0].id !== worldsService.selectedPickaxe.id}"
+                    [ngClass]="{'btn': true, 'btn-secondary': pickaxeGroup[0].id === worldsService.getSelectedPickaxe().id, 'btn-outline-secondary': pickaxeGroup[0].id !== worldsService.getSelectedPickaxe().id}"
                 >{{pickaxeGroup[0].name ?? '[hand]'}}</button>
             </div>
             <div *ngIf="!pickaxeGroup[1]"> <!-- Locked pickaxe -->

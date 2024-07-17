@@ -18,7 +18,7 @@ export class PickaxeSelectorInterfaceComponent {
   }
 
   selectPickaxe(pickaxe:any) {
-    this.worldsService.selectedPickaxe = pickaxe;
+    this.worldsService.setSelectedPickaxe(pickaxe);
     this.activeModal.close();
   }
   

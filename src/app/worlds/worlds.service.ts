@@ -7,31 +7,77 @@ import { Material } from './material';
   providedIn: 'root'
 })
 export class WorldsService {
-  public currentWorld:World;
+  private currentWorldId:number;
   public startWorld:World;
   public worlds:World[] = [];
-  public selectedPickaxe:Pickaxe;
+  private selectedPickaxeId:[number, number]; // [worldId, pickaxeId]
 
   constructor() { 
     this.startWorld = this.getWorldTemplate();
-    this.currentWorld = this.startWorld;
+    this.currentWorldId = this.startWorld.id;
     this.worlds.push(this.startWorld);
 
-    this.selectedPickaxe = this.currentWorld.pickaxes.find(p => p[1] === true)![0];
+    this.selectedPickaxeId = [this.getCurrentWorld().id, this.getCurrentWorld().pickaxes.find(p => p[1] === true)![0].id]; 
+
+    this.loadData();
+    this.saveData();
+  }
+
+  public saveData():void {
+    localStorage.setItem('worlds', JSON.stringify(this.worlds));
+    localStorage.setItem('currentWorldId', JSON.stringify(this.currentWorldId));
+    localStorage.setItem('selectedPickaxeId', JSON.stringify(this.selectedPickaxeId));
+  }
+  public loadData():void {
+    const worlds:string|null = localStorage.getItem('worlds');
+    if (!worlds || worlds.length === 0) {
+      return;
+    }
+    const currentWorldId:string|null = localStorage.getItem('currentWorldId');
+    if (!currentWorldId || currentWorldId.length === 0) {
+      return;
+    }
+    const selectedPickaxeId:string|null = localStorage.getItem('selectedPickaxeId');
+    if (!selectedPickaxeId || selectedPickaxeId.length === 0) {
+      return;
+    }
+
+    this.worlds = JSON.parse(worlds);
+    this.currentWorldId = JSON.parse(currentWorldId);
+    this.selectedPickaxeId = JSON.parse(selectedPickaxeId);
+  }
+  public getJson():string {
+    return JSON.stringify({
+      worlds: this.worlds,
+      currentWorldId: this.currentWorldId,
+      selectedPickaxeId: this.selectedPickaxeId
+    });
+  }
+  public loadJson(json:string):void {
+    const data = JSON.parse(json);
+    this.worlds = data.worlds;
+    this.currentWorldId = data.currentWorldId;
+    this.selectedPickaxeId = data.selectedPickaxeId;
   }
 
   public getWorld(id:number):World {
     return this.worlds.find(w => w.id === id)!;
   }
-  public getMaterial(id:number):any {
-    return this.currentWorld.materials.find(m => m[0].id === id)![0];
+  public getCurrentWorld():World {
+    return this.getWorld(this.currentWorldId);
   }
-  public getPickaxe(id:number):any {
-    return this.currentWorld.pickaxes.find(p => p[0].id === id)![0];
+  public getMaterial(id:number):Material {
+    return this.getCurrentWorld().materials.find(m => m[0].id === id)![0];
+  }
+  public getPickaxe(id:number):Pickaxe {
+    return this.getCurrentWorld().pickaxes.find(p => p[0].id === id)![0];
+  }
+  public getSelectedPickaxe():Pickaxe {
+    return this.getWorld(this.selectedPickaxeId[0]).pickaxes.find(p => p[0].id === this.selectedPickaxeId[1])![0];
   }
 
   public mineWithCurrentPickaxe():Material {
-    const cumulativeDistribution: [Material, number][] = this.getCumulativeDistribution(this.selectedPickaxe.probabilities!);
+    const cumulativeDistribution: [Material, number][] = this.getCumulativeDistribution(this.getSelectedPickaxe().probabilities!);
 
     // Generate a random number between 0 and the total sum of frequencies
     const randomValue = Math.random();
@@ -39,7 +85,9 @@ export class WorldsService {
     // Find the corresponding letter based on the random value
     for (const [material, cumulativeFreq] of cumulativeDistribution) {
         if (randomValue <= cumulativeFreq) {
-          this.currentWorld.materials.find(m => m[0].id === material.id)![1]++;
+          this.getCurrentWorld().materials.find(m => m[0].id === material.id)![1]++;
+
+          this.saveData();
 
           return material;
         }
@@ -83,7 +131,11 @@ export class WorldsService {
 
   public requirementsMet(requirements:CraftRequirement[]):boolean {
     for (let requirement of requirements) {
-      if (this.getWorld(this.getMaterial(requirement.materialId).fromWorldId).materials.find(m => m[0].id === requirement.materialId)![1] < requirement.quantity) {
+      const material = this.getWorld(this.getMaterial(requirement.materialId).fromWorldId)
+      .materials.find(m => m[0].id === requirement.materialId);
+      console.log(material);
+
+      if (material![1] < requirement.quantity) {
         return false;
       }
     }
@@ -98,7 +150,17 @@ export class WorldsService {
     for (let requirement of pickaxe.requiredToCraft!) {
       this.getWorld(this.getMaterial(requirement.materialId).fromWorldId).materials.find(m => m[0].id === requirement.materialId)![1] -= requirement.quantity;
     }
-    this.currentWorld.pickaxes.find(p => p[0].id === pickaxe.id)![1] = true;
+    this.getCurrentWorld().pickaxes.find(p => p[0].id === pickaxe.id)![1] = true;
+    this.saveData();
+  }
+  
+  public setSelectedPickaxe(pickaxe:Pickaxe) {
+    this.selectedPickaxeId = [pickaxe.fromWorldId, pickaxe.id];
+    this.saveData();
+  }
+  public setWorld(world:World) {
+    this.currentWorldId = world.id;
+    this.saveData();
   }
 
   public getWorldTemplate():World {

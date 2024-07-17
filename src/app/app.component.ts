@@ -35,9 +35,11 @@ export class AppComponent {
       }
     }
     if (event.key === 'ArrowRight') {
+      event.preventDefault();
       this.router.navigate([this.cycleRoutes[routeIndex + 1] || this.cycleRoutes[routeIndex]]);
     }
     if (event.key === 'ArrowLeft') {
+      event.preventDefault();
       this.router.navigate([this.cycleRoutes[routeIndex - 1] || this.cycleRoutes[routeIndex]]);
     }
   }
